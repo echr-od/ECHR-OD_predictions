@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
 from matplotlib.colors import ListedColormap
+import numpy as np
+import itertools
+import pandas as pd
 
 
 def make_permutations_histogram_plot(permutation_scores, score, prevalence):
@@ -27,36 +30,25 @@ def make_permutations_histogram_plot(permutation_scores, score, prevalence):
 def make_confusion_matrix_plot(cm, classes,
                           normalize=False,
                           title='Confusion matrix',
-                          cmap=plt.cm.Blues):
-    """
-    This function prints and plots the confusion matrix.
-    Normalization can be applied by setting `normalize=True`.
-    """
+                          cmap=sns.cubehelix_palette(as_cmap=True)):
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-        print("Normalized confusion matrix")
-    else:
-        print('Confusion matrix, without normalization')
+    df_cm = pd.DataFrame(cm, index = classes, columns = classes, )
+    sns.set(font_scale=1.)
+    mask = df_cm == 0.
+    labels = []
+    for x in cm:
+        labels.append(['{:.2f}'.format(e) if e > 0.009999 else ' ' for e in x])
+    labels = pd.DataFrame(labels, index = classes, columns = classes, )
+    with sns.axes_style("white"):
+        h = sns.heatmap(df_cm, annot=labels, annot_kws={"size": 5}, cmap = cmap, fmt='', xticklabels=classes, yticklabels=classes, mask=mask)# font size
+    h.tick_params(labelsize=10)
+    plt.xlabel('x-axis = predicted labels; y-axis = true labels')
+    plt.subplots_adjust(left=0.17, bottom=0.21)
+    ax = plt.axes()
+    ax.set_title(title)
+    return plt
 
-    print(cm)
-
-    plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title)
-    plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45)
-    plt.yticks(tick_marks, classes)
-
-    fmt = '.2f' if normalize else 'd'
-    thresh = cm.max() / 2.
-    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, format(cm[i, j], fmt),
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
-
-    plt.tight_layout()
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
 
 def make_ROC_curve_plot(roc_auc):
     '''
@@ -80,3 +72,33 @@ def make_ROC_curve_plot(roc_auc):
     plt.title('Receiver operating characteristic example')
     plt.legend(loc="lower right")
     plt.show()
+
+
+def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
+                        n_jobs=None, train_sizes=np.linspace(.01, 0.1, 5)):
+    plt.figure()
+    plt.title(title)
+    if ylim is not None:
+        plt.ylim(*ylim)
+    plt.xlabel("Training examples")
+    plt.ylabel("Score")
+    train_sizes, train_scores, test_scores = learning_curve(
+        estimator, X, y, cv=cv, n_jobs=n_jobs, train_sizes=train_sizes, verbose=10)
+    train_scores_mean = np.mean(train_scores, axis=1)
+    train_scores_std = np.std(train_scores, axis=1)
+    test_scores_mean = np.mean(test_scores, axis=1)
+    test_scores_std = np.std(test_scores, axis=1)
+    plt.grid()
+
+    plt.fill_between(train_sizes, train_scores_mean - train_scores_std,
+                     train_scores_mean + train_scores_std, alpha=0.1,
+                     color="r")
+    plt.fill_between(train_sizes, test_scores_mean - test_scores_std,
+                     test_scores_mean + test_scores_std, alpha=0.1, color="g")
+    plt.plot(train_sizes, train_scores_mean, 'o-', color="r",
+             label="Training score")
+    plt.plot(train_sizes, test_scores_mean, 'o-', color="g",
+             label="Cross-validation score")
+
+    plt.legend(loc="best")
+    return plt

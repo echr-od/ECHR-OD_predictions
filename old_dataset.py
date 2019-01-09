@@ -31,17 +31,17 @@ classifiers = OrderedDict({
     #"Bernoulli Naive Bayes": BernoulliNB(),
     #"Multinomial Naive Bayes": MultinomialNB(),
     #"Gaussian Naive Bayes": GaussianNB(),
-    #"K-Neighbors": KNeighborsClassifier(n_jobs=-1)
-    #"Linear SVC": SVC(kernel='linear', probability=True)#,
+    #"K-Neighbors": KNeighborsClassifier(n_jobs=-1),
+    "Linear SVC": SVC(kernel='linear', probability=True),
     #"RBF SVC": SVC(probability=True),
     #"RBF NuSVC": NuSVC(probability=True),
     #"Gaussian Process": GaussianProcessClassifier(),
-    #Extra Tree": ExtraTreeClassifier(),
+    "Extra Tree": ExtraTreeClassifier(),
     #"Decision Tree": DecisionTreeClassifier(max_depth=None),
-    #"Random Forest": RandomForestClassifier(n_estimators=100),
+    "Random Forest": RandomForestClassifier(n_estimators=100),
     #"BaggingClassifier": BaggingClassifier(),
     #"Ensemble Extra Tree": ExtraTreesClassifier(n_estimators=100),
-    #"Gradient Boosting": GradientBoostingClassifier(),
+    "Gradient Boosting": GradientBoostingClassifier(),
     #"AdaBoost": AdaBoostClassifier(),
     #"Neural Net": MLPClassifier(max_iter=500)
     #"QDA": QuadraticDiscriminantAnalysis()
@@ -155,12 +155,39 @@ datasets = [
         'labels': 'data/input/old_dataset/Article8/cases_a8.csv', 
         'min_treshold': 100
     },
+    {
+        'name': 'Article 3 - Topics and Circumstances',
+        'features': 'data/input/old_dataset/Article3/topic_circumstances3.csv',
+        'labels': 'data/input/old_dataset/Article3/cases_a3.csv', 
+        'min_treshold': 100
+    },
+    {
+        'name': 'Article 6 - Topics and Circumstances',
+        'features': 'data/input/old_dataset/Article6/topic_circumstances6.csv',
+        'labels': 'data/input/old_dataset/Article6/cases_a6.csv', 
+        'min_treshold': 100
+    },
+    {
+        'name': 'Article 8 - Topics and Circumstances',
+        'features': 'data/input/old_dataset/Article8/topic_circumstances8.csv',
+        'labels': 'data/input/old_dataset/Article8/cases_a8.csv', 
+        'min_treshold': 100
+    }
+]
+
+datasets = [
+	{
+        'name': 'Article 3 - Topics',
+        'features': 'data/input/old_dataset/Article3/topics3.csv',
+        'labels': 'data/input/old_dataset/Article3/cases_a3.csv', 
+        'min_treshold': 100
+    }
 ]
 
 for dataset in datasets:
     # Load datasets
     dataset_name = dataset.get('name', dataset['features'])
-    X, y, o = load_CSV_ECHR_instance(
+    X, y, o = (
             X_file=dataset['features'], 
             y_file=dataset['labels'],
             min_threshold=dataset.get('min_threshold', 100)
@@ -168,8 +195,8 @@ for dataset in datasets:
     prev = len([e for e in y if e == 1]) / (1. * len(y))
     o['prevalence'] = np.round_(prev, ROUND_DIGITS)
     format_filter_output(dataset_name, o)
-    update_dataset_result(dataset_name, dataset, result_file)
-    update_dataset_filter_result(dataset_name, o, result_file)
+    #update_dataset_result(dataset_name, dataset, result_file)
+    #update_dataset_filter_result(dataset_name, o, result_file)
     for classifier_name, classifier in classifiers.iteritems():
         try:
             scoring = make_scorers()
@@ -182,6 +209,6 @@ for dataset in datasets:
                 n_jobs=-1)
             classifier_output = process_score(scores, scoring, seed)
             format_method_output(classifier_name, classifier_output)
-            update_classifier_result(dataset_name, classifier_name, classifier_output, result_file)
+            #update_classifier_result(dataset_name, classifier_name, classifier_output, result_file)
         except Exception as e:
             print(e)
