@@ -41,6 +41,11 @@ root
 
 # Usage and reproducibility
 
+To install the dependencies:
+```
+pip install -r requirements.txt
+```
+
 The experimental environment variables are defined in ```echr_experiments/config.py```. If you wish to replicate (i.e. find exactly the same results) the experiments from the article *European Court of Human Rights Open Data project*, leave the default value.
 
 If you want to reproduce all experiments and analysis from scratch, remove the files in ```/data/output/``` and in ```/data/analysis/```:
