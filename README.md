@@ -1,5 +1,6 @@
 # Repository structure
 
+```
 root
    |
    |----- data
@@ -36,7 +37,7 @@ root
    |----- multilabel_plot_results.py                   <-- script to plot results from multilabel output
    |----- README.md
    |----- .gitignore
-
+```
 
 # Usage and reproducibility
 
