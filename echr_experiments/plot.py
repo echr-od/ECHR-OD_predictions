@@ -50,6 +50,30 @@ def make_confusion_matrix_plot(cm, classes,
     return plt
 
 
+def make_binary_confusion_matrix_plot(cm, classes,
+                          normalize=False,
+                          title='Confusion matrix',
+                          cmap=sns.cubehelix_palette(as_cmap=True)):
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+    df_cm = pd.DataFrame(cm, index = classes, columns = classes, )
+    sns.set(font_scale=1.)
+    mask = df_cm == 0.
+    labels = []
+    for x in cm:
+        labels.append(['{:.2f}'.format(e) for e in x])
+    labels = pd.DataFrame(labels, index = classes, columns = classes, )
+    with sns.axes_style("white"):
+        h = sns.heatmap(df_cm, annot=labels, annot_kws={"size": 20}, cmap = cmap, fmt='', xticklabels=classes, yticklabels=classes, mask=mask)# font size
+    h.tick_params(labelsize=15)
+    plt.xlabel('x-axis = predicted labels; y-axis = true labels')
+    plt.subplots_adjust(left=0.17)#, bottom=0.21)
+    plt.tight_layout()
+    ax = plt.axes()
+    ax.set_title(title)
+    return plt
+
+
 def make_ROC_curve_plot(roc_auc):
     '''
     # Compute ROC curve and ROC area for each class

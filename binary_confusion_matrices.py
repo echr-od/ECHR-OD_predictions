@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from echr_experiments.config import ROUND_DIGITS, ANALYSIS_PATH, BINARY_OUTPUT_FILE
 from echr_experiments.format import data_to_article, floatify
-from echr_experiments.plot import make_confusion_matrix_plot
+from echr_experiments.plot import make_binary_confusion_matrix_plot
 from echr_experiments.utils import get_best_configurations
 
 from matplotlib import rcParams
@@ -35,9 +35,10 @@ def main():
                     cnf_matrix = np .array([np.array(xi) for xi in cnf_matrix])
                     # Plot non-normalized confusion matrix
                     plt.figure()
-                    title = '{} on {}'.format(method, dataset.split(' - ')[-1])
-                    make_confusion_matrix_plot(cnf_matrix, classes=class_names, title=title)
-                    plt.savefig(path.join(ANALYSIS_PATH, 'cm', 'binary_cm{}_{}_{}_{}.png'.format('_normalized' if norm else '', target, method.replace(' ', '_').lower(), dataset.replace(' ', '_').lower())), dpi=600)
+                    title = '{}\n{}'.format(dataset, method)
+                    make_binary_confusion_matrix_plot(cnf_matrix, classes=class_names, title=title)
+                    title = 'binary_cm{}_{}_{}.png'.format('_normalized' if norm else '', target, dataset.split(' - ')[0].replace(' ', '_').lower())
+                    plt.savefig(path.join(ANALYSIS_PATH, 'cm', title), dpi=600)
                     plt.close('all')
 
 if __name__ == "__main__":
