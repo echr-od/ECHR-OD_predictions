@@ -26,7 +26,7 @@ ROUND_DIGITS = 4
 ANALYSIS_PATH = 'data/analysis'
 OUTPUT_PATH = 'data/output'
 INPUT_PATH = 'data/input'
-DEFAULT_FEATURE_THRESHOLD = 100
+DEFAULT_FEATURE_THRESHOLD = 0
 
 # ECHR specific
 BINARY_OUTPUT_FILE = path.join(OUTPUT_PATH, 'result_binary.json')
@@ -72,12 +72,8 @@ MULTICLASS_CLASSIFIERS = OrderedDict({
     "Multinomial Naive Bayes": MultinomialNB(),
     # CANNOT BE USED WITH SPARSE MATRIX # "Gaussian Naive Bayes": GaussianNB(),
 
-    ### K-Neighbors
-    #"K-Neighbors": KNeighborsClassifier(),
-
     #### SVM
     "Linear SVC": SVC(kernel='linear', probability=True),
-    "RBF SVC": SVC(probability=True),
 
     # CANNOT BE USED WITH SPARSE MATRIX "Gaussian Process": GaussianProcessClassifier(),
 
