@@ -136,7 +136,7 @@ def generate_datasets_descriptors(articles=None, flavors_filter=None, min_thresh
     keys = ['name', 'features', 'labels', 'min_threshold']
     datasets = []
     for i in itertools.product(articles, flavors):
-        name = i[0] if not i[0].startswith('article') else 'Article {}'.format(i[0].split('_')[-1])
+        name = i[0].title() if not i[0].startswith('article') else 'Article {}'.format(i[0].split('_')[-1])
         base_path = 'data/input/{}/'.format(i[0])
         descriptor = {
             'name': '{} - {}'.format(name, i[1][1]),
