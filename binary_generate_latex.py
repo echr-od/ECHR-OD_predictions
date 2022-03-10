@@ -18,8 +18,8 @@ def generate_latex_table_binary_article(name, _data, key=("acc", "Accuracy"), st
     data = copy.deepcopy(_data)
 
     best_per_dataset = {}
-    for method, datasets in _data.iteritems():
-        for dataset, res in datasets.iteritems():
+    for method, datasets in _data.items():
+        for dataset, res in datasets.items():
             if dataset not in best_per_dataset:
                 best_per_dataset[dataset] = np.round_(res['test']['test_{}'.format(key[0])], 4)
             else:
@@ -58,9 +58,9 @@ def generate_latex_table_binary_article(name, _data, key=("acc", "Accuracy"), st
 def generate_latex_table_binary_best_article(metric_name, _data, key="acc", std=True):
     data = copy.deepcopy(_data)
     best_per_article = {}
-    for article, entry in data.iteritems():
-        for method, datasets in entry.iteritems():
-            for dataset, res in datasets.iteritems():
+    for article, entry in data.items():
+        for method, datasets in entry.items():
+            for dataset, res in datasets.items():
                 val = float(res['test']['test_{}'.format(key)])
                 if article not in best_per_article:
                     best_per_article[article] = res
@@ -75,7 +75,7 @@ def generate_latex_table_binary_best_article(metric_name, _data, key="acc", std=
     micro_average = 0.
     total_cases = 0.
     cases_per_articles = number_cases_per_article(best_per_article.keys())
-    for article, entry in best_per_article.iteritems():
+    for article, entry in best_per_article.items():
         average += float(entry['test']['test_{}'.format(key)])
         micro_average += float(entry['test']['test_{}'.format(key)]) * float(cases_per_articles[article])
         total_cases += float(cases_per_articles[article])
@@ -105,11 +105,11 @@ def generate_latex_table_binary_best_article(metric_name, _data, key="acc", std=
 def generate_latex_table_binary_overall(metric_name, _data, key="acc", std=True, micro=True):
     data = copy.deepcopy(_data)
     best_per_method = {}
-    for method, entry in data.iteritems():
+    for method, entry in data.items():
         if method not in best_per_method:
             best_per_method[method] = {}
-        for article, datasets in entry.iteritems():
-            for dataset, res in datasets.iteritems():
+        for article, datasets in entry.items():
+            for dataset, res in datasets.items():
                 val = float(res['test']['test_{}'.format(key)])
                 if article not in best_per_method[method]:
                     best_per_method[method][article] = res
@@ -119,12 +119,12 @@ def generate_latex_table_binary_overall(metric_name, _data, key="acc", std=True,
 
     average_per_method = {}
     micro_average_per_method = {}
-    for method, entry in best_per_method.iteritems():
+    for method, entry in best_per_method.items():
         average = 0.
         micro_average = 0.
         total_cases = 0.
         cases_per_articles = number_cases_per_article(entry.keys())
-        for article, _ in entry.iteritems():
+        for article, _ in entry.items():
             average += best_per_method[method][article]['test']['test_{}'.format(key)]
             micro_average += best_per_method[method][article]['test']['test_{}'.format(key)] * float(cases_per_articles[article])
             total_cases += float(cases_per_articles[article])
@@ -135,12 +135,12 @@ def generate_latex_table_binary_overall(metric_name, _data, key="acc", std=True,
         return float(average_per_method[m])
 
     average = 0.
-    for method, entry in average_per_method.iteritems():
+    for method, entry in average_per_method.items():
         average += float(entry)
     average /= len(average_per_method.keys())
 
     micro_average = 0.
-    for method, entry in micro_average_per_method.iteritems():
+    for method, entry in micro_average_per_method.items():
         micro_average += float(entry)
     micro_average /= len(micro_average_per_method.keys())
 
@@ -172,7 +172,8 @@ def main():
     """
         RESULTS PER ARTICLE
     """
-    data_per_article, prev = data_to_article(_data)
+    data_per_article, prev, meta = data_to_article(_data)
+
     keys = [
         ('acc', 'Accuracy'), 
         ('mcc', "MCC"), 
@@ -181,7 +182,7 @@ def main():
         ('f1_weighted', "F1 score"), 
         #('balanced_acc', "Balanced accuracy")
     ]
-    for article, data in data_per_article.iteritems():
+    for article, data in data_per_article.items():
         for key in keys:
             std = False if key[0] != 'acc' else True
             save('binary_{}_{}.tex'.format(key[0], article.replace(' ', '_').lower()), 
@@ -195,7 +196,7 @@ def main():
     """
         BEST RESULT PER ARTICLE WITH FLAVOR AND METHOD
     """
-    data_per_article, prev = data_to_article(_data)
+    data_per_article, prev, meta = data_to_article(_data)
     keys = [
         ('acc', 'Accuracy'), 
         ('mcc', "MCC"), 

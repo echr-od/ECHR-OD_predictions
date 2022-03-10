@@ -7,11 +7,15 @@ from sklearn.metrics import recall_score, \
                             precision_recall_curve, \
                             accuracy_score, \
                             matthews_corrcoef, \
+                            jaccard_score, \
                             zero_one_loss, \
                             coverage_error, \
                             label_ranking_loss, \
                             hamming_loss, \
-                            jaccard_similarity_score, \
+                            recall_score, \
+                            f1_score, \
+                            average_precision_score, \
+                            precision_score, \
                             balanced_accuracy_score
 import numpy as np
 from functools import partial
@@ -68,15 +72,15 @@ def make_scorers(multilabel=False, multiclass=False, CM=None):
     elif multilabel:
         scoring = {
             'acc': 'accuracy',
-            'f1_weighted': 'f1_weighted',
-            'recall': 'recall_weighted',
+            'f1_weighted': make_scorer(f1_score, average='micro'),
+            'recall': make_scorer(recall_score, average='micro'),
             'zero_one_loss': make_scorer(zero_one_loss),
             'coverage_error': make_scorer(coverage_error),
             'label_ranking_loss': make_scorer(label_ranking_loss),
             'hamming_loss': make_scorer(hamming_loss),
-            'jaccard_similarity_score': make_scorer(jaccard_similarity_score),
-            'average_precision': 'average_precision',
-            'precision': 'precision_weighted'
+            'jaccard_similarity_score': make_scorer(jaccard_score, average='micro'),
+            'average_precision': make_scorer(average_precision_score, average='micro'),
+            'precision': make_scorer(precision_score, average='micro'),
             #'roc_auc': 'roc_auc'
         }
     else:
@@ -102,6 +106,8 @@ def add_cm(y_true, y_pred, cm=None):
     return 0
 
 def calculate_average_cm(CM, train_score=True):
+    print('CONFUSION MATRICES')
+    print(CM)
     rounder = np.vectorize(lambda x: '{:.4f}'.format(np.round_(x, ROUND_DIGITS)))
     result = {}
     folds = len(CM) if not train_score else len(CM) / 2
@@ -150,7 +156,7 @@ def process_score(scores, scoring, seed, multilabel=False):
         'time': {}
     }
     scoring_keys = scoring.keys()
-    mean_scores = {k:v.mean() for k,v in scores.iteritems()}
+    mean_scores = {k:v.mean() for k,v in scores.items()}
     train_keys = map(lambda x: 'train_{}'.format(x), scoring_keys)
     for k in train_keys:
         classifier_output['train'][k] = mean_scores[k]

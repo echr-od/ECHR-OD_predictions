@@ -13,7 +13,7 @@ def generate_latex_table_multiclass(_data, key=("acc", "Accuracy"), std=True, or
     data = data_to_method(copy.deepcopy(_data))
 
     best_per_dataset = {}
-    for dataset, methods in _data.iteritems():
+    for dataset, methods in _data.items():
         name = dataset.split(' - ')[-1]
         best_per_dataset[name] = order([np.round_(m['test']['test_{}'.format(key[0])], ROUND_DIGITS) for m in methods['methods'].values()])
     nb_columns = 4 #

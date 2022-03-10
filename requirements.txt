@@ -1,5 +1,8 @@
 scikit-learn
 numpy
 panda
-matplotlib
-seaborn
+matplotlib==3.3.2
+seaborn==0.11.1
+rich
+pyyaml
+scipy

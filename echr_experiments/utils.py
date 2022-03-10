@@ -1,7 +1,37 @@
 import json
 from os import path
-from config import ANALYSIS_PATH
-from format import data_to_article
+from echr_experiments.config import ANALYSIS_PATH
+from echr_experiments.format import data_to_article
+
+
+def update_article_desc(article, result, path):
+    data = {}
+    try:
+        with open(path, "r") as f:
+            data = json.load(f)
+    except:
+        pass
+
+    if article not in data:
+        data[article] = {}
+
+    data[article] = result
+
+    with open(path, "w") as f:
+        json.dump(data, f, indent=4)
+
+
+def update_dataset_metadata(dataset_name, result, path):
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    if 'filter' not in data[dataset_name]:
+        data[dataset_name]['filter'] = {}
+
+    data[dataset_name]['filter'] = result
+
+    with open(path, "w") as f:
+        json.dump(data, f, indent=4)
 
 
 def update_classifier_result(dataset_name, classifier_name, result, path):
@@ -53,12 +83,12 @@ def get_best_configurations(path):
     with open(path) as f:
         data = json.load(f)
 
-    data, _ = data_to_article(data)
+    data, prev, meta = data_to_article(data)
     key = 'acc'
     best_per_article = {}
-    for article, entry in data.iteritems():
-        for method, datasets in entry.iteritems():
-            for dataset, res in datasets.iteritems():
+    for article, entry in data.items():
+        for method, datasets in entry.items():
+            for dataset, res in datasets.items():
                 val = float(res['test']['test_{}'.format(key)])
                 if article not in best_per_article:
                     best_per_article[article] = res
@@ -70,7 +100,7 @@ def get_best_configurations(path):
                         best_per_article[article]['flavor'] = dataset
                         best_per_article[article]['method'] = method
     res = []
-    for article, element in best_per_article.iteritems():
+    for article, element in best_per_article.items():
         dataset_name = '{} - {}'.format(article, element['flavor'])
         res.append([dataset_name, element['method']])
     return res

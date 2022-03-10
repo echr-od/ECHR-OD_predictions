@@ -31,7 +31,7 @@ def data_to_article(_data):
         if article not in prev:
             prev[article] = _data[entry]['filter']['prevalence']
         if "methods" in _data[entry]:
-            for method, d in _data[entry]["methods"].iteritems():
+            for method, d in _data[entry]["methods"].items():
                 if method not in data[article]:
                     data[article][method] = {}
                 data[article][method][dataset] = d
@@ -41,8 +41,8 @@ def generate_samples_per_article(name, _data, key="acc", order=max):
     data = copy.deepcopy(_data)
 
     best_per_dataset = {}
-    for method, datasets in _data.iteritems():
-        for dataset, res in datasets.iteritems():
+    for method, datasets in _data.items():
+        for dataset, res in datasets.items():
             if dataset not in best_per_dataset:
                 best_per_dataset[dataset] = np.round_(res['test']['test_{}'.format(key)], 4)
             else:
@@ -53,7 +53,7 @@ def generate_samples_per_article(name, _data, key="acc", order=max):
     sample_bow_desc = []
     max_m = max([len(m) for m in data.keys()])
     for i, method in enumerate(sorted(data.keys())):
-        for i, dataset in enumerate(dataset_short.keys()[1:]):
+        for i, dataset in enumerate(list(dataset_short.keys())[1:]):
             if dataset in data[method]:
                 d = data[method][dataset]
                 val = np.round_(d['test']['test_{}'.format(key)], 4)
@@ -72,11 +72,11 @@ def generate_samples_per_method(name, _data, key="acc", std=True, order=max):
     sample_bow = {}
     sample_bow_desc = {}
     data_per_article, prev = data_to_article(_data)
-    for article, d in data_per_article.iteritems():
+    for article, d in data_per_article.items():
         data = copy.deepcopy(d)
         best_per_dataset = {}
-        for method, datasets in data.iteritems():
-            for dataset, res in datasets.iteritems():
+        for method, datasets in data.items():
+            for dataset, res in datasets.items():
                 if dataset not in best_per_dataset:
                     best_per_dataset[dataset] = np.round_(res['test']['test_{}'.format(key)], 4)
                 else:
@@ -88,7 +88,7 @@ def generate_samples_per_method(name, _data, key="acc", std=True, order=max):
                 sample_bow[method] = []
             if method not in sample_bow_desc:
                 sample_bow_desc[method] = []
-            for i, dataset in enumerate(dataset_short.keys()[1:]):
+            for i, dataset in enumerate(list(dataset_short.keys())[1:]):
                 if dataset in data[method]:
                     d = data[method][dataset]
                     val = np.round_(d['test']['test_{}'.format(key)], 4)
@@ -118,7 +118,7 @@ def main():
     """
     data_per_article, prev = data_to_article(_data)
     keys = ['acc'] #, 'mcc', 'precision', 'recall', 'f1_weighted'] #, 'balanced_acc']
-    for article, data in data_per_article.iteritems():
+    for article, data in data_per_article.items():
         for key in keys:
             print(' # {} - {}'.format(article, key))
             generate_samples_per_article(article, data, key=key, order=max)

@@ -13,7 +13,7 @@ from matplotlib import rcParams
 rcParams.update({'figure.autolayout': True})
 
 output_file = MULTICLASS_OUTPUT_FILE
-outcome_file = path.join(INPUT_PATH, 'multiclass', 'outcomes_variables.json')
+outcome_file = path.join(INPUT_PATH, 'datasets', 'outcomes_variables.json')
 
 def sort_article(a):
     i = a[0].split(' ')[1]
@@ -28,12 +28,12 @@ def main():
     with open(outcome_file) as f:
         outcomes_data = json.load(f)
 
-    outcomes_mapping = {str(v):k for k,v in outcomes_data.iteritems()}
+    outcomes_mapping = {str(v):k for k,v in outcomes_data.items()}
 
     #dataset = "Multiclass - Descriptive features only"
     for dataset in raw_results.keys():
         if "methods" in raw_results[dataset]:
-            for method, data in raw_results[dataset]["methods"].iteritems():
+            for method, data in raw_results[dataset]["methods"].items():
                 target = "test"
                 #method = "Random Forest"
                 cnf_matrix = data["confusion_matrix"]["{}_n".format(target)]

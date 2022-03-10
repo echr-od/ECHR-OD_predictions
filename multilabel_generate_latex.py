@@ -18,8 +18,8 @@ def generate_latex_table_multilabel_article(name, _data, key="acc", std=True, or
     data = copy.deepcopy(_data)
 
     best_per_dataset = {}
-    for method, datasets in _data.iteritems():
-        for dataset, res in datasets.iteritems():
+    for method, datasets in _data.items():
+        for dataset, res in datasets.items():
             if dataset not in best_per_dataset:
                 best_per_dataset[dataset] = np.round_(res['test']['test_{}'.format(key)], 4)
             else:
@@ -60,9 +60,9 @@ def main():
     """
         RESULTS PER ARTICLE
     """
-    data_per_article, prev = data_to_article(_data)
+    data_per_article, prev, meta = data_to_article(_data)
     keys = ['acc', 'precision', 'recall', 'f1_weighted', 'zero_one_loss', 'jaccard_similarity_score', 'hamming_loss'] #, 'balanced_acc']
-    for article, data in data_per_article.iteritems():
+    for article, data in data_per_article.items():
         for key in keys:
             std = False if key != 'acc' else True
             save('{}_{}.tex'.format(article.replace(' ', '_').lower(), key), 

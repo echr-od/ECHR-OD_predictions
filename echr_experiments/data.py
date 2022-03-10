@@ -4,7 +4,7 @@ import pandas as pd
 from scipy import sparse
 from sklearn.preprocessing import MultiLabelBinarizer
 
-from config import ROUND_DIGITS
+from echr_experiments.config import ROUND_DIGITS
 
 
 def check_empty_cases(X):
@@ -50,7 +50,43 @@ def load_ECHR_instance(X_file, y_file, min_threshold, multilabel=False, multicla
     X = sparse.csr_matrix((data, indices, indptr), dtype=int)
     
     with open(y_file) as file:
+        f = lambda x: {x.split(':')[0]:x.split(':')[1]}
+
         outcomes = file.readlines()
+        outcomes = pd.DataFrame(outcomes)
+        outcomes[0] = outcomes[0].apply(lambda x: x.strip().split())#, axis=1)
+        outcomes['caseid'] = outcomes[0].apply(lambda x: x[0])
+        outcomes[0] = outcomes[0].apply(lambda x: x[1:])#, axis=1)
+        from sklearn.preprocessing import MultiLabelBinarizer
+        mlb = MultiLabelBinarizer(sparse_output=True)
+        outcomes = outcomes.join(
+                    pd.DataFrame.sparse.from_spmatrix(
+                        mlb.fit_transform(outcomes.pop(0)),
+                        index=outcomes.index,
+                        columns=mlb.classes_))
+        def map_outcome(x):
+            if x[f'{art}:1'] == 1:
+                return 1 
+            elif x[f'{art}:0'] == 1:
+                return -1
+            else: 
+                return 0
+        
+        for c in outcomes.columns:
+            if c != 'caseid':
+
+                art, val = c.split(':')
+                if f'{art}:1' in outcomes.columns and f'{art}:0' in outcomes.columns:
+                    print(art)
+                    outcomes[art] = outcomes.apply(lambda x: map_outcome(x), axis=1)
+                    #outcomes[art] = outcomes[f'{art}:0'].apply(lambda x: -1 if val == 1 else x)
+        #            print(outcomes[art].value_counts())
+        #print(outcomes)
+        #exit(1)
+                #outcomes.drop(columns="c")
+        #return outcomes
+
+        '''
         if not multilabel and not multiclass:
             outcomes = np.array([int(d.split()[-1].split(':')[-1]) for d in outcomes])
         else:
@@ -60,6 +96,7 @@ def load_ECHR_instance(X_file, y_file, min_threshold, multilabel=False, multicla
             else:
                 outcomes = np.array([d.split()[-1] for d in outcomes])
         file.close()
+        '''
     y = outcomes
     return X, y, filter_output
     return X.toarray(), y, filter_output
@@ -125,7 +162,8 @@ def load_CSV_ECHR_instance(X_file, y_file, min_threshold):
 def generate_datasets_descriptors(articles=None, flavors_filter=None, min_threshold=0):
     import itertools
     if articles is None:
-        articles = map(lambda x: 'article_{}'.format(x), ['1', '2', '3', '5', '6', '8', '10', '11', '13', '34', 'p1'])
+        articles = ['all'] #map(lambda x: 'article_{}'.format(x), ['1', '2', '3', '5', '6', '8', '10', '11', '13', '34', 'p1'])
+    articles = ['datasets']
     flavors = [
         ('BoW', 'Bag-of-Words only'), 
         ('descriptive', 'Descriptive features only'),

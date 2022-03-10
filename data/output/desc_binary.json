@@ -1,0 +1,68 @@
+{
+    "5": {
+        "size": 2090,
+        "violation": 1901,
+        "non_violation": 189,
+        "prevalence": 0.9095693779904306
+    },
+    "8": {
+        "size": 1434,
+        "violation": 1075,
+        "non_violation": 359,
+        "prevalence": 0.7496513249651325
+    },
+    "2": {
+        "size": 683,
+        "violation": 594,
+        "non_violation": 89,
+        "prevalence": 0.8696925329428989
+    },
+    "3": {
+        "size": 2263,
+        "violation": 2004,
+        "non_violation": 259,
+        "prevalence": 0.8855501546619532
+    },
+    "13": {
+        "size": 1925,
+        "violation": 1816,
+        "non_violation": 109,
+        "prevalence": 0.9433766233766234
+    },
+    "p1-1": {
+        "size": 1411,
+        "violation": 1279,
+        "non_violation": 132,
+        "prevalence": 0.9064493267186393
+    },
+    "14": {
+        "size": 401,
+        "violation": 219,
+        "non_violation": 182,
+        "prevalence": 0.5461346633416458
+    },
+    "6": {
+        "size": 6994,
+        "violation": 6337,
+        "non_violation": 657,
+        "prevalence": 0.906062339147841
+    },
+    "10": {
+        "size": 714,
+        "violation": 555,
+        "non_violation": 159,
+        "prevalence": 0.7773109243697479
+    },
+    "11": {
+        "size": 275,
+        "violation": 237,
+        "non_violation": 38,
+        "prevalence": 0.8618181818181818
+    },
+    "34": {
+        "size": 181,
+        "violation": 122,
+        "non_violation": 59,
+        "prevalence": 0.6740331491712708
+    }
+}
