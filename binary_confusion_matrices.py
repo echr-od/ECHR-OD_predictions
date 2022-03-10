@@ -36,6 +36,8 @@ def main():
                     # Plot non-normalized confusion matrix
                     plt.figure()
                     title = '{}\n{}'.format(dataset, method)
+                    print(cnf_matrix)
+                    print(class_names, title)
                     make_binary_confusion_matrix_plot(cnf_matrix, classes=class_names, title=title)
                     title = 'binary_cm{}_{}_{}.png'.format('_normalized' if norm else '', target, dataset.split(' - ')[0].replace(' ', '_').lower())
                     plt.savefig(path.join(ANALYSIS_PATH, 'cm', title), dpi=600)

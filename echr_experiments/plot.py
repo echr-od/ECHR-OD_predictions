@@ -69,6 +69,7 @@ def make_binary_confusion_matrix_plot(cm, classes,
     plt.xlabel('x-axis = predicted labels; y-axis = true labels')
     plt.subplots_adjust(left=0.17)#, bottom=0.21)
     plt.tight_layout()
+
     ax = plt.axes()
     ax.set_title(title)
     return plt
