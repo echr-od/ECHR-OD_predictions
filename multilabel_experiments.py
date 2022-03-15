@@ -8,6 +8,8 @@ from pathlib import Path
 import re
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+from bidict import bidict
 from scipy import sparse
 from sklearn.model_selection import cross_validate, StratifiedKFold, KFold
 from sklearn.preprocessing import LabelEncoder
@@ -35,7 +37,8 @@ from echr_experiments.config import ROUND_DIGITS, \
                                     K_FOLD, \
                                     AS_TIME_SERIES, \
                                     MULTILABEL_CLASSIFIERS, \
-                                    DEFAULT_FEATURE_THRESHOLD
+                                    DEFAULT_FEATURE_THRESHOLD, \
+                                    ANALYSIS_PATH
 from echr_experiments.format import format_filter_output, format_method_output
 from echr_experiments.data import load_ECHR_instance, generate_datasets_descriptors
 from echr_experiments.scorers import make_scorers, process_score, calculate_average_cm
@@ -228,14 +231,6 @@ def run(console, build, force):
     global print
     print = __console.print
 
-    #force = True
-
-    print(Markdown("- **Step configuration**"))
-    input_folder = os.path.join(build, 'raw', 'raw_cases_info')
-    output_folder = path.join(build, 'intermediate')
-    print(TAB + '> Step folder: {}'.format(path.join(build, 'cases_info')))
-    make_build_folder(console, output_folder, force, strict=False)
-
     outcomes_path = 'data/input/datasets/'
     raw_outcome_file = Path(outcomes_path) / 'outcomes.txt'
     outcome_matrix_file = Path(outcomes_path) / 'outcomes_matrix.csv'
@@ -249,42 +244,57 @@ def run(console, build, force):
     if True: #not os.path.isfile(outcome_matrix_file) or force:
         print(TAB + '> Generate the outcome matrix [green][DONE]')
         outcomes_matrix = generate_outcomes_data(raw_outcome_file, outcome_to_id, filter_threshold=100)
-        print(outcomes_matrix)
         outcomes_matrix.to_csv(outcome_matrix_file)
     else:
         print(TAB + '> Load the outcome matrix [green][DONE]')
     outcomes_matrix = pd.read_csv(outcome_matrix_file)
 
+    label_numbers = outcomes_matrix.apply(lambda x: len(x['0'].split()), axis=1)
+    label_numbers = label_numbers.value_counts()
+    fig = plt.figure()
+    ax = label_numbers.plot.bar(x='lab', y='val', rot=0)
+    for p in ax.patches:
+        ax.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
+    fig.savefig(Path(ANALYSIS_PATH) / 'labels_per_cases.png')
+    print(TAB + '> Generate the plot of labels counts [green][DONE]')
+
     outcomes_matrix = _generate_outcomes_data(raw_outcome_file, outcome_to_id, filter_threshold=100)
-    #outcomes_matrix = outcomes_matrix[['caseid', 'labels']]
     
-    print(outcomes_matrix)
+    metadata = outcomes_matrix[outcomes_matrix.columns[1:]]
+    metadata = pd.DataFrame(metadata.sum())
+    metadata['label'] = metadata.index
+    metadata['article'] = metadata.apply(lambda x: x.label.split(':')[0], axis=1)
+    summary = metadata[0].T
 
-    # Class encoding
-    #le = LabelEncoder()
-    #for index, row in outcomes_matrix.iterrows():
-    #    print(row[0])
-    #    le.fit(row[0])
-    #all_labels = list(set([e for x in outcomes_matrix['labels'].value_counts().index for e in x ]))
-    #le.fit(all_labels)
-    #mapping_class = dict(zip(le.classes_, le.transform(le.classes_)))
+    arts = metadata['article'].unique()
+    c_outcomes = bidict(outcome_to_id)
+    metadata = {}
+    for art in arts:
+        if art not in metadata:
+            metadata[art] = {}
+        metadata[art]['Article'] = c_outcomes.inverse[int(art)]
+        if f'{art}:1' in summary and f'{art}:0' in summary:
+            metadata[art]['Size'] = int(summary[f'{art}:1'] + summary[f'{art}:0'])
+        elif f'{art}:1' not in summary:
+            metadata[art]['Size'] = int(summary[f'{art}:0'])
+        else:
+            metadata[art]['Size'] = int(summary[f'{art}:1'])
 
+        if f'{art}:1' in summary:
+            metadata[art]['Violation'] = int(summary[f'{art}:1'])
+        else:
+            metadata[art]['Violation'] = 0
 
-    #outcomes_matrix['decision'] = outcomes_matrix['labels'].apply(lambda x: [le.transform([e])[0] for e in x])
-    #outcomes_matrix['article'] = outcomes_matrix['labels'].apply(lambda x: [e.split(':')[0] for e in x])
+        if f'{art}:0' in summary:
+            metadata[art]['No-Violation'] = int(summary[f'{art}:0'])
+        else:
+            metadata[art]['No-Violation'] = 0
+        metadata[art]['Prevalence'] = float(metadata[art]['Violation'] / (metadata[art]['Violation'] + metadata[art]['No-Violation']))
+
+    update_article_desc('Multilabel', metadata, MULTILABEL_DESC_OUTPUT_FILE)
+    print(TAB + '> Update dataset description [green][DONE]')
+    
     CM = []  # Confusion matrices 
-
-    '''
-    count = outcomes_matrix['article'].value_counts()
-    count = json.loads(count.to_json())
-    
-    count = {k:v for k,v in count.items() if v > 100}
-    articles_to_keep = list(count.keys())
-    outcomes_matrix = outcomes_matrix[outcomes_matrix['article'].isin(articles_to_keep)]
-    '''
-    #print(outcomes_matrix['article'].value_counts())
-    
-
     print(Markdown("- **Experiment summary**"))
     FLAVORS = {'Descriptive only': 'descriptive.txt', 'Bag-of-Words only': 'BoW.txt', 'Descriptive and Bag-of-Words': 'descriptive+BoW.txt'}
     print(f"  | Flavors: {len(FLAVORS)}")
@@ -300,9 +310,7 @@ def run(console, build, force):
         exp_results = {}
         print(TAB + '> No previous results [green][DONE]')
 
-
     table = Table(title="Cross-Validation Summary")
-
     table.add_column("Flavor", style="cyan", no_wrap=True)
     table.add_column("Method", justify="right", style="blue")
     table.add_column("Status", justify="right", style="green")
@@ -343,22 +351,13 @@ def run(console, build, force):
         if dataset_name not in exp_results:
             exp_results[dataset_name] = {}
 
-        #format_filter_output(dataset_name, o)
         update_dataset_result(dataset_name, o, result_file)
         update_dataset_filter_result(dataset_name, o, result_file)
 
         metadata = exp_results.get(dataset_name, {}).get('filter', {})
-        metadata['size'] = metadata.get('size', int(y.shape[0]))
-        #metadata['violation'] = metadata.get('violation', int(y_art.sum()))
-        #metadata['non_violation'] = metadata['size'] - metadata['violation']
-        #metadata['prevalence'] = float(metadata['violation']) / metadata['size']
-                
+        metadata['size'] = metadata.get('size', int(y.shape[0]))        
         update_dataset_metadata(dataset_name, metadata, result_file)
         print(TAB + '> Generate dataset metadata [green][DONE]')
-
-        #if flavor == 'Descriptive only':
-        #    update_article_desc(art, metadata, Multilabel_DESC_OUTPUT_FILE)
-        #    print(TAB + '> Update dataset description [green][DONE]')
 
         CM = []
         for classifier_name, classifier in classifiers.items():
@@ -369,8 +368,7 @@ def run(console, build, force):
                         try:
                             scoring = make_scorers(multilabel=True, CM=CM)
                             cv = TimeSeriesSplit(n_splits=k_fold) if as_time_series \
-                                else KFold(n_splits=k_fold) #, random_state=seed)
-                            #scores = cross_validate(classifier, X_art.to_numpy(), y_art.to_numpy(),
+                                else KFold(n_splits=k_fold) 
                             scores = cross_validate(classifier, X, y,
                                 cv=cv, 
                                 scoring=scoring, 
@@ -378,10 +376,6 @@ def run(console, build, force):
                                 verbose=10,
                                 n_jobs=-1, error_score='raise')
                             classifier_output = process_score(scores, scoring, seed, multilabel=True)
-                            #cm = calculate_average_cm(CM, train_score=True)
-                            #classifier_output['confusion_matrix'] = cm
-                            #classifier_output['confusion_matrix']['class_labels'] = list(le.classes_)
-                            #format_method_output(classifier_name, classifier_output)
                             update_classifier_result(
                                 dataset_name, 
                                 classifier_name, 
@@ -391,7 +385,6 @@ def run(console, build, force):
                             pass
                         except Exception as e:
                             print(e)
-
 
 
 def main(args):

@@ -74,26 +74,26 @@ MULTICLASS_ARTICLES = ['multiclass']
 MULTICLASS_FLAVORS = ['BoW', 'descriptive', 'descriptive+BoW']
 MULTICLASS_CLASSIFIERS = OrderedDict({
     ### Naive Bayes
-    #"Bernoulli Naive Bayes": BernoulliNB(),
-    #"Multinomial Naive Bayes": MultinomialNB(),
+    "Bernoulli Naive Bayes": BernoulliNB(),
+    "Multinomial Naive Bayes": MultinomialNB(),
     # CANNOT BE USED WITH SPARSE MATRIX # "Gaussian Naive Bayes": GaussianNB(),
 
     #### SVM
-    #"Linear SVC": CalibratedClassifierCV(LinearSVC(random_state=SEED), cv=StratifiedKFold(n_splits=K_FOLD)),
+    "Linear SVC": CalibratedClassifierCV(LinearSVC(random_state=SEED), cv=StratifiedKFold(n_splits=K_FOLD)),
 
     # CANNOT BE USED WITH SPARSE MATRIX "Gaussian Process": GaussianProcessClassifier(),
 
     ### Tree-based
-    #"Extra Tree": ExtraTreeClassifier(max_depth=None, random_state=SEED),
+    "Extra Tree": ExtraTreeClassifier(max_depth=None, random_state=SEED),
     "Decision Tree": DecisionTreeClassifier(max_depth=None, random_state=SEED),
-    #"Random Forest": RandomForestClassifier(n_estimators=100, random_state=SEED),
-    #"BaggingClassifier": BaggingClassifier(random_state=SEED),
-    #"Ensemble Extra Tree": ExtraTreesClassifier(n_estimators=100, random_state=SEED),
-    #"Gradient Boosting": GradientBoostingClassifier(n_estimators=100, random_state=SEED),
-    #"AdaBoost": AdaBoostClassifier(base_estimator=DecisionTreeClassifier(max_depth=3), random_state=SEED),
+    "Random Forest": RandomForestClassifier(n_estimators=100, random_state=SEED),
+    "BaggingClassifier": BaggingClassifier(random_state=SEED),
+    "Ensemble Extra Tree": ExtraTreesClassifier(n_estimators=100, random_state=SEED),
+    "Gradient Boosting": GradientBoostingClassifier(n_estimators=100, random_state=SEED),
+    "AdaBoost": AdaBoostClassifier(base_estimator=DecisionTreeClassifier(max_depth=3), random_state=SEED),
 
     ### Others
-    #"Neural Net": MLPClassifier(random_state=SEED),
+    "Neural Net": MLPClassifier(random_state=SEED),
     # CANNOT BE USED WITH SPARSE MATRIX "QDA": QuadraticDiscriminantAnalysis()
 })
 

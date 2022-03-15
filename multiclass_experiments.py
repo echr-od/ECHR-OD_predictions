@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 import pandas as pd
 import numpy as np
+from bidict import bidict
 from scipy import sparse
 from sklearn.model_selection import cross_validate, StratifiedKFold
 from sklearn.preprocessing import LabelEncoder
@@ -113,20 +114,12 @@ def run(console, build, force):
     global print
     print = __console.print
 
-    #force = True
-
-    print(Markdown("- **Step configuration**"))
-    input_folder = os.path.join(build, 'raw', 'raw_cases_info')
-    output_folder = path.join(build, 'intermediate')
-    print(TAB + '> Step folder: {}'.format(path.join(build, 'cases_info')))
-    make_build_folder(console, output_folder, force, strict=False)
-
     outcomes_path = 'data/input/datasets/'
     raw_outcome_file = Path(outcomes_path) / 'outcomes.txt'
     outcome_matrix_file = Path(outcomes_path) / 'outcomes_matrix.csv'
 
     print(Markdown("- **Prepare outcome matrix**"))
-    OUTCOME_TO_ID = 'data/input/datasets/outcomes_variables.json'
+    OUTCOME_TO_ID =  'data/input/datasets/outcomes_variables.json'
     with open(OUTCOME_TO_ID, 'r') as f:
         outcome_to_id = json.load(f)
 
@@ -134,7 +127,6 @@ def run(console, build, force):
     if True: #not os.path.isfile(outcome_matrix_file) or force:
         print(TAB + '> Generate the outcome matrix [green][DONE]')
         outcomes_matrix = generate_outcomes_data(raw_outcome_file, outcome_to_id, filter_threshold=100)
-        print(outcomes_matrix)
         outcomes_matrix.to_csv(outcome_matrix_file)
     else:
         print(TAB + '> Load the outcome matrix [green][DONE]')
@@ -150,8 +142,6 @@ def run(console, build, force):
     outcomes_matrix['article'] = outcomes_matrix[0].apply(lambda x: x.split(':')[0])
     CM = []  # Confusion matrices 
 
-    print(outcomes_matrix)
-
     count = outcomes_matrix['article'].value_counts()
     count = json.loads(count.to_json())
     
@@ -162,8 +152,18 @@ def run(console, build, force):
     le = LabelEncoder()
     le.fit(outcomes_matrix[0])
     mapping_class = dict(zip(le.classes_, le.transform(le.classes_)))
-    #print(list(le.classes_))
-    #exit(1)
+    
+    c_outcomes = bidict(outcome_to_id)
+    metadata = json.loads(outcomes_matrix['article'].value_counts().to_json())
+    metadata = {k:{'Size': v, 'Article': c_outcomes.inverse[int(k)] } for k,v in metadata.items()} # c_outcomes.inverse[int(k)]
+    for art, mdata in metadata.items():
+        mdata['Violation'] = outcomes_matrix[outcomes_matrix[0] == f'{art}:1'].shape[0]
+        mdata['No-Violation'] = outcomes_matrix[outcomes_matrix[0] == f'{art}:0'].shape[0]
+        mdata['Prevalence'] = mdata['Violation'] / (mdata['Violation'] + mdata['No-Violation'])
+
+    update_article_desc('Multiclass', metadata, MULTICLASS_DESC_OUTPUT_FILE)
+    print(TAB + '> Update dataset description [green][DONE]')
+
     print(Markdown("- **Experiment summary**"))
     FLAVORS = {'Descriptive only': 'descriptive.txt', 'Bag-of-Words only': 'BoW.txt', 'Descriptive and Bag-of-Words': 'descriptive+BoW.txt'}
     print(f"  | Flavors: {len(FLAVORS)}")
@@ -248,7 +248,7 @@ def run(console, build, force):
                         try:
                             scoring = make_scorers(multiclass=True, CM=CM)
                             cv = TimeSeriesSplit(n_splits=k_fold) if as_time_series \
-                                else StratifiedKFold(n_splits=2) #k_fold) #, random_state=seed)
+                                else StratifiedKFold(n_splits=k_fold) #, random_state=seed)
                             #scores = cross_validate(classifier, X_art.to_numpy(), y_art.to_numpy(),
                             scores = cross_validate(classifier, X, y,
                                 cv=cv, 

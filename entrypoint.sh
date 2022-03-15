@@ -18,7 +18,7 @@ function run {
         python3 ./binary_experiments.py ${@:3}
     elif [[ "$2" = "multiclass" ]] ; then
         python3 ./multiclass_experiments.py ${@:3}
-    elif [[ "$2" = "multiclass" ]] ; then
+    elif [[ "$2" = "multilabel" ]] ; then
         python3 ./multilabel_experiments.py ${@:3}
     fi
 }
@@ -40,6 +40,10 @@ function analyze {
     fi
 }
 
+function reports {
+    python3 ./generate_reports.py
+}
+
 function lint_source_code {
     python -m pylint --rcfile=.pylintrc *.py
 }
@@ -54,6 +58,8 @@ function handle_input {
           run $@
         elif [[ "$1" = "analyze" ]] ; then
           analyze $@
+        elif [[ "$1" = "reports" ]] ; then
+          reports $@
         elif [[ "$1" = "test" ]] ; then
             python -m pytest -v -c ./.pytest.ini --disable-warnings &&\
             lint_source_code

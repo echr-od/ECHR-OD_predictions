@@ -127,10 +127,6 @@ def load_dataset(X_file, min_threshold=0):
         X = file.readlines()
         X = pd.DataFrame(X)
         X[0] = X[0].apply(lambda x: sorted(x.strip().split()))
-        #X['caseid'] = X[0].apply(lambda x: x[0])
-        #X[0] = X[0].apply(lambda x: x[1:])
-
-
 
         # Generate hot-one outcome matrix
         mlb = MultiLabelBinarizer(sparse_output=True)
@@ -146,14 +142,6 @@ def run(console, build, title, doc_ids=None, force=False):
     __console = console
     global print
     print = __console.print
-
-    #force = True
-
-    print(Markdown("- **Step configuration**"))
-    input_folder = os.path.join(build, 'raw', 'raw_cases_info')
-    output_folder = path.join(build, 'intermediate')
-    print(TAB + '> Step folder: {}'.format(path.join(build, 'cases_info')))
-    make_build_folder(console, output_folder, force, strict=False)
 
     outcomes_path = 'data/input/datasets/'
     raw_outcome_file = Path(outcomes_path) / 'outcomes.txt'
@@ -269,8 +257,7 @@ def run(console, build, title, doc_ids=None, force=False):
                         try:
                             scoring = make_scorers()
                             cv = TimeSeriesSplit(n_splits=k_fold) if as_time_series \
-                                else StratifiedKFold(n_splits=k_fold) #, random_state=seed)
-                            #scores = cross_validate(classifier, X_art.to_numpy(), y_art.to_numpy(),
+                                else StratifiedKFold(n_splits=k_fold)
                             scores = cross_validate(classifier, X_art, y_art,
                                 cv=cv, 
                                 scoring=scoring, 
@@ -278,8 +265,6 @@ def run(console, build, title, doc_ids=None, force=False):
                                 verbose=10,
                                 n_jobs=-1, error_score='raise')
                             classifier_output = process_score(scores, scoring, seed)
-
-                            #format_method_output(classifier_name, classifier_output)
                             update_classifier_result(
                                 dataset_name, 
                                 classifier_name, 

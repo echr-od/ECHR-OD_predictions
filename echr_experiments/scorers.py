@@ -106,43 +106,17 @@ def add_cm(y_true, y_pred, cm=None):
     return 0
 
 def calculate_average_cm(CM, train_score=True):
-    print('CONFUSION MATRICES')
-    print(CM)
     rounder = np.vectorize(lambda x: '{:.4f}'.format(np.round_(x, ROUND_DIGITS)))
     result = {}
     folds = len(CM) if not train_score else len(CM) / 2
     cm = CM[0::2]
-    #print('FOLD: {}'.format(folds))
-    #print('LEN {}'.format(len(cm)))
     avg_cm = np.sum([i / float(folds) for i in cm], 0)
-    #print('AVG {}'.format(len(avg_cm)))
     if train_score:
         result['test'] =rounder(avg_cm).tolist()
         result['test_n'] = rounder(avg_cm.astype('float') / avg_cm.sum(axis=1)[:, np.newaxis]).tolist()
         result['train'] = np.sum([i / float(folds) for i in CM[1::2]], 0)
         result['train_n'] = rounder(result['train'].astype('float') / result['train'].sum(axis=1)[:, np.newaxis]).tolist()
         result['train'] = rounder(result['train']).tolist()
-        '''
-        print('TEST')
-        acc = 0.
-        t = 0.
-        for i,x in enumerate(result['test']):
-            acc += float(x[i])
-            t += sum([float(e) for e in x])
-            print(i, x[i], t)
-        acc /= t
-        print('ACC TEST {}'.format(acc))
-
-        print('TRAIN')
-        acc = 0.
-        t = 0.
-        for i,x in enumerate(result['train']):
-            acc += float(x[i])
-            t += sum([float(e) for e in x])
-            print(i, x[i], t)
-        acc /= t
-        print('ACC TRAIN {}'.format(acc))
-        '''
     else:
         result['test'] = rounder(avg_cm)
     return result
