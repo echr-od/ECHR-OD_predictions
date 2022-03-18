@@ -40,28 +40,28 @@ BINARY_ARTICLES = map(lambda x: 'article_{}'.format(x),
 BINARY_FLAVORS = ['BoW', 'descriptive', 'descriptive+BoW']
 BINARY_CLASSIFIERS = OrderedDict({
     ### Naive Bayes
-    #"Bernoulli Naive Bayes": BernoulliNB(),
-    #"Multinomial Naive Bayes": MultinomialNB(),
+    "Bernoulli Naive Bayes": BernoulliNB(),
+    "Multinomial Naive Bayes": MultinomialNB(),
     # CANNOT BE USED WITH SPARSE MATRIX # "Gaussian Naive Bayes": GaussianNB(),
 
     ### K-Neighbors
-    #"K-Neighbors": KNeighborsClassifier(),
+    "K-Neighbors": KNeighborsClassifier(),
 
     #### SVM
     "Linear SVC": CalibratedClassifierCV(LinearSVC(random_state=SEED), cv=StratifiedKFold(n_splits=K_FOLD)), #SVC(kernel='linear', probability=False),
     #"Linear SVC": SVC(kernel='linear', probability=True),
-    #"RBF SVC": SVC(probability=True),
+    "RBF SVC": SVC(probability=True),
 
     # CANNOT BE USED WITH SPARSE MATRIX "Gaussian Process": GaussianProcessClassifier(),
 
     ### Tree-based
-    #"Extra Tree": ExtraTreeClassifier(max_depth=None, random_state=SEED),
-    #"Decision Tree": DecisionTreeClassifier(max_depth=None, random_state=SEED),
-    #"Random Forest": RandomForestClassifier(n_estimators=100, random_state=SEED),
-    #"BaggingClassifier": BaggingClassifier(random_state=SEED),
-    #"Ensemble Extra Tree": ExtraTreesClassifier(n_estimators=100, random_state=SEED),
-    #"Gradient Boosting": GradientBoostingClassifier(n_estimators=100, random_state=SEED),
-    #"AdaBoost": AdaBoostClassifier(random_state=SEED),
+    "Extra Tree": ExtraTreeClassifier(max_depth=None, random_state=SEED),
+    "Decision Tree": DecisionTreeClassifier(max_depth=None, random_state=SEED),
+    "Random Forest": RandomForestClassifier(n_estimators=100, random_state=SEED),
+    "BaggingClassifier": BaggingClassifier(random_state=SEED),
+    "Ensemble Extra Tree": ExtraTreesClassifier(n_estimators=100, random_state=SEED),
+    "Gradient Boosting": GradientBoostingClassifier(n_estimators=100, random_state=SEED),
+    "AdaBoost": AdaBoostClassifier(random_state=SEED),
 
     ### Others
     "Neural Net": MLPClassifier(max_iter=500, random_state=SEED),
