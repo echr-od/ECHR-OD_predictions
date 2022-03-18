@@ -8,7 +8,6 @@ root
    |        |        |----- cm                         <-- confusion matrix plots
    |        |        |----- lc                         <-- learning curves plots
    |        |        |----- tables                     <-- latex tables
-   |        |----- input                               <-- folder containing the datasets from ECHR-OD
    |        |----- output                              <-- folder containing the experiments raw output
    |        |        |----- result_binary.json         <-- results for binary datasets
    |        |        |----- result_multiclass.json     <-- results for multiclass dataset
@@ -25,6 +24,7 @@ root
    |----- binary_generate_latex.py                     <-- script to generate latex tables from binary output
    |----- binary_learning_curves.py                    <-- generate the learning curves for the best methods on each binary dataset
    |----- binary_statistics.py                         <-- generate statistics about the binary datasets
+   |----- generate_reports  .py                        <-- script to generate the reports
    |----- multiclass_experiments.py                    <-- script to run experiments on multiclass dataset
    |----- multiclass_confusion_matrices.py             <-- script to plot confusion matrices from multiclass output
    |----- multiclass_generate_latex.py                 <-- script to generate latex tables from multiclass output
@@ -33,6 +33,7 @@ root
    |----- multilabel_plot_results.py                   <-- script to plot results from multilabel output
    |----- README.md
    |----- .gitignore
+   |----- Dockerfile                                   <-- instruction to build the docker image
 ```
 
 
