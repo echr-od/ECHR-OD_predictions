@@ -50,11 +50,18 @@ docker run -it --rm --mount src=$(pwd),dst=/tmp/echr_experiments/,type=bind --mo
 where `<ECHR_OD_BUILD>` is the **absolute** path to ECHR-OD build to use and `<task>` is the classification task to solve among `binary`, `multiclass` and `multilabel`.
 
 
-To run the experiments:
+To analyze the experiments:
 ```
 docker run -it --rm --mount src=$(pwd),dst=/tmp/echr_experiments/,type=bind --mount src=<ECHR_OD_BUILD>,dst=/tmp/echr_experiments/data/input/,type=bind echr_experiments analyze <task>
 ```
-where `<ECHR_OD_BUILD>` and `<task>` are as define above.
+where `<ECHR_OD_BUILD>` and `<task>` are as defined above.
+
+
+To generate the report:
+```
+docker run -it --rm --mount src=$(pwd),dst=/tmp/echr_experiments/,type=bind --mount src=<ECHR_OD_BUILD>,dst=/tmp/echr_experiments/data/input/,type=bind echr_experiments reports
+```
+where `<ECHR_OD_BUILD>` is as defined above.
 
 
 # Configuration
