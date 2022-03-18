@@ -42,6 +42,8 @@ function analyze {
 
 function reports {
     python3 ./generate_reports.py
+    pdflatex ./data/analysis/report.tex  
+    mv ./report.pdf ./data/analysis/report.pdf
 }
 
 function lint_source_code {

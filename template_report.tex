@@ -1,0 +1,111 @@
+\documentclass{article}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage[section]{placeins}
+
+\begin{document}
+
+\title{ECHR-OD Benchmarks Report}
+
+
+\maketitle
+
+\tableofcontents
+
+
+\section*{Introduction}
+
+This report has been generated automatically from a template.
+
+\section{Dataset descriptions}
+
+This section contains a description of the datasets used for the benchmarks.
+Table \ref{table:binary_datasets} describes binary datasets. Table \ref{table:multiclass_datasets} describes the multiclass dataset and Table \ref{table:multilabel_datasets} describes the multilabel dataset.
+
+\input{data/analysis/tables/binary_datasets_summary.tex}~\\
+\newpage
+
+\input{data/analysis/tables/multiclass_datasets_summary.tex}~\\
+\newpage
+
+\input{data/analysis/tables/multilabel_datasets_summary.tex}~\\
+\newpage
+
+
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.6]{data/analysis/labels_per_cases.png}
+    \caption{Histogram representing the number of labels per cases for the multilabel dataset.}
+\end{figure}
+
+
+
+\section{Binary Classification}
+\subsection{Best Results per Article}
+
+This section presents the best results for several evaluation metrics and each article. It also reports the corresponding flavor.
+
+\BLOCK{ for x in best_tables }
+	\input{data/analysis/tables/\VAR{x}}
+	%\newpage
+\BLOCK{ endfor }
+
+\subsection{Summary \& Method ranking}
+
+\BLOCK{ for x in summary_tables }
+	\input{data/analysis/tables/\VAR{x}}\\
+	\newpage
+\BLOCK{ endfor }
+
+\subsection{Detailed Results}
+
+This section presents the results for each method on each article and for all evaluation metrics.
+It also reports the best normalized confusion matrices for each article.\\
+
+\noindent
+\BLOCK{ for x in binary_tables }
+	\input{data/analysis/tables/\VAR{x}}~\\
+	%\newpage
+\BLOCK{ endfor }
+
+
+\BLOCK{ for x in binary_cm }
+\begin{figure}[!htb]
+	\centering
+    \includegraphics[scale=0.5]{data/analysis/cm/\VAR{x}}  
+\end{figure}
+\BLOCK{ endfor }
+
+\newpage
+
+\section{Multiclass Classification}
+
+This section presents the results for each method on each article and for all evaluation metrics.
+It also reports the best normalized confusion matrices for each article.\\
+
+\noindent
+\BLOCK{ for x in multiclass_tables }
+	\input{data/analysis/tables/\VAR{x}}~\\
+\BLOCK{ endfor }
+
+~\\\newpage
+\BLOCK{ for x in multiclass_cm }
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[scale=0.7]{data/analysis/cm/\VAR{x}}  
+\end{figure}
+\BLOCK{ endfor }
+
+\newpage
+\section{Multilabel Classification}
+
+This section presents the results for each method on each article and for all evaluation metrics.\\
+
+\noindent
+\BLOCK{ for x in multilabel_tables }
+	\input{data/analysis/tables/\VAR{x}}~\\
+\BLOCK{ endfor }
+
+
+\end{document}

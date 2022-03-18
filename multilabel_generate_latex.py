@@ -29,7 +29,7 @@ def generate_latex_table_multilabel_article(name, _data, key="acc", std=True, or
     column_placement = '|l' * (nb_columns) + '|'
     latex_output  = "\\begin{tabular}{" + column_placement + " }\n"
     latex_output += "\\hline\n"
-    latex_output += " &  \multicolumn{3}{c|}{" + name + "} \\\\\n"
+    latex_output += " &  \multicolumn{3}{c|}{"+ key.replace('_', ' ').title() + " - " + name + "} \\\\\n"
     latex_output += "\cline{2-4} & desc & BoW & both \\\\ \hline" + "\n"
     average = 0.
     max_m = max([len(m) for m in data.keys()])

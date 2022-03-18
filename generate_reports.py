@@ -22,7 +22,11 @@ from rich.progress import (
 )
 from rich.panel import Panel
 from rich.tree import Tree
-from echr_experiments.config import BINARY_DESC_OUTPUT_FILE, MULTICLASS_DESC_OUTPUT_FILE, MULTILABEL_DESC_OUTPUT_FILE
+from echr_experiments.config import ANALYSIS_PATH, \
+                                    BINARY_DESC_OUTPUT_FILE, \
+                                    MULTICLASS_DESC_OUTPUT_FILE, \
+                                    MULTILABEL_DESC_OUTPUT_FILE
+from echr_experiments.latex import initialize_latex_env
 
 from math import floor, log10
 
@@ -33,7 +37,7 @@ def run(console, build, force):
 
 
     N = 2
-    print(Markdown("- **Prepare dataset descriptions**"))
+    print(Markdown("- **Prepare binary datasets descriptions**"))
     with open(BINARY_DESC_OUTPUT_FILE, 'r') as f:
         binary_desc = json.load(f)
 
@@ -47,11 +51,11 @@ def run(console, build, force):
     binary_desc['prevalence'] = prev.apply(lambda x: round(x, N - int(floor(log10(abs(x))))))
     binary_desc.columns = [c.replace('_', ' ').title() for c in binary_desc.columns]
     binary_desc.to_latex(Path(ANALYSIS_PATH) / 'tables' / 'binary_datasets_summary.tex', 
-        bold_rows=True, label='table:binary_datasets', caption='Datasets description for binary classification.')
+        bold_rows=False, label='table:binary_datasets', caption='Datasets description for binary classification.')
 
 
 
-    print(Markdown("- **Prepare dataset descriptions**"))
+    print(Markdown("- **Prepare multilabel dataset descriptions**"))
     with open(MULTICLASS_DESC_OUTPUT_FILE, 'r') as f:
         multiclass_desc = json.load(f)
     multiclass_desc = pd.DataFrame(multiclass_desc['Multiclass'].values())
@@ -76,7 +80,7 @@ def run(console, build, force):
 
 
 
-    print(Markdown("- **Prepare dataset descriptions**"))
+    print(Markdown("- **Prepare multilabel dataset descriptions**"))
     with open(MULTILABEL_DESC_OUTPUT_FILE, 'r') as f:
         multilabel_desc = json.load(f)
     print(multilabel_desc)
@@ -99,9 +103,35 @@ def run(console, build, force):
     multilabel_desc = multilabel_desc.rename(columns={'Article': ""})
     multilabel_desc.to_latex(Path(ANALYSIS_PATH) / 'tables' / 'multilabel_datasets_summary.tex', 
         bold_rows=True, index=False, label='table:multilabel_datasets', 
-        caption='Datasets description for multilabel classification.')
-
+        caption='Datasets description for multilabel classification.') 
     
+
+    from os import listdir
+    from os.path import isfile, join
+
+    tables = Path(ANALYSIS_PATH) / 'tables'
+    cm = Path(ANALYSIS_PATH) / 'cm'
+    best_tables = sorted([f for f in listdir(tables) if isfile(join(tables, f)) and  '_best' in f])
+    summary_tables = sorted([f for f in listdir(tables) if isfile(join(tables, f)) and  '_summary' in f and 'datasets' not in f])
+    binary_tables = sorted([f for f in listdir(tables) if isfile(join(tables, f)) and f.startswith('binary') and '_article_' in f])
+    multiclass_tables = sorted([f for f in listdir(tables) if isfile(join(tables, f)) and f.startswith('multiclass') and 'datasets' not in f])
+    multilabel_tables = sorted([f for f in listdir(tables) if isfile(join(tables, f)) and f.startswith('multilabel') and 'datasets' not in f])
+    binary_cm = sorted([f for f in listdir(cm) if isfile(join(cm, f)) and f.startswith('binary_cm_normalized')])
+    multiclass_cm = sorted([f for f in listdir(cm) if isfile(join(cm, f)) and f.startswith('multiclass_cm')])
+    
+
+    latex_jinja_env = initialize_latex_env()
+    template = latex_jinja_env.get_template('template_report.tex')
+    with open(Path(ANALYSIS_PATH) / 'report.tex', 'w') as f:
+        f.write(template.render(
+            binary_tables=binary_tables,
+            multiclass_tables=multiclass_tables,
+            multilabel_tables=multilabel_tables,
+            summary_tables=summary_tables,
+            best_tables=best_tables,
+            binary_cm=binary_cm,
+            multiclass_cm=multiclass_cm,
+            section2='Short Form'))
 
 
 def main(args):

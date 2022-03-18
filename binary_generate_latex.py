@@ -30,7 +30,7 @@ def generate_latex_table_binary_article(name, _data, key=("acc", "Accuracy"), st
     latex_output  = "\\begin{tabular}{" + column_placement + " }\n"
     latex_output += "\\hline\n"
     if prev is not None:
-        latex_output += 'Prev=' + str(prev) + " &  \multicolumn{3}{c|}{" + key[1] + ' - ' + name + "} \\\\\n"
+        latex_output += 'Prev=' + str(round(prev, 4)) + " &  \multicolumn{3}{c|}{" + key[1] + ' - ' + name + "} \\\\\n"
     else:
         latex_output += " &  \multicolumn{3}{c|}{" + name + "} \\\\\n"
     latex_output += "\cline{2-4} & desc & BoW & both \\\\ \hline" + "\n"
@@ -159,7 +159,10 @@ def generate_latex_table_binary_overall(metric_name, _data, key="acc", std=True,
         if micro:
             latex_output += ' & {:.4f}'.format(micro_average_per_method[method])
         latex_output += ' & ' + str(i + 1) + '\\\\\n'
-    latex_output += 'Average & {:.4f} & {:.4f} & \\\\\n'.format(np.round_(average, 4), np.round_(micro_average, 4))
+    if key == 'acc':
+        latex_output += 'Average & {:.4f} & {:.4f} & \\\\\n'.format(np.round_(average, 4), np.round_(micro_average, 4))
+    else:
+        latex_output += 'Average & {:.4f} & \\\\\n'.format(np.round_(average, 4))
     latex_output += "\\hline\n"
     latex_output += "\end{tabular}"
     return latex_output

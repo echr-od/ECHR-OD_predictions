@@ -8,3 +8,4 @@ pyyaml
 scipy
 pylint
 bidict
+jinja2
