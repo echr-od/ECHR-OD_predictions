@@ -46,16 +46,17 @@ Table \ref{table:binary_datasets} describes binary datasets. Table \ref{table:mu
 
 This section presents the best results for several evaluation metrics and each article. It also reports the corresponding flavor.
 
+\noindent
 \BLOCK{ for x in best_tables }
-	\input{data/analysis/tables/\VAR{x}}
+	\input{data/analysis/tables/\VAR{x}}~\\
 	%\newpage
 \BLOCK{ endfor }
 
 \subsection{Summary \& Method ranking}
 
 \BLOCK{ for x in summary_tables }
-	\input{data/analysis/tables/\VAR{x}}\\
-	\newpage
+	\input{data/analysis/tables/\VAR{x}}~\\
+	%\newpage
 \BLOCK{ endfor }
 
 \subsection{Detailed Results}
