@@ -13,6 +13,16 @@ function display_help {
     echo '  lint              - Runs pylint.'
 }
 
+function check {
+    if [[ "$2" = 'binary' ]] ; then
+        python3 ./binary_check.py ${@:3}
+    elif [[ "$2" = "multiclass" ]] ; then
+        python3 ./multiclass_check.py ${@:3}
+    elif [[ "$2" = "multilabel" ]] ; then
+        python3 ./multilabel_check.py ${@:3}
+    fi
+}
+
 function run {
     if [[ "$2" = 'binary' ]] ; then
         python3 ./binary_experiments.py ${@:3}
@@ -43,6 +53,7 @@ function analyze {
 function reports {
     python3 ./generate_reports.py
     pdflatex ./data/analysis/report.tex  
+    pdflatex ./data/analysis/report.tex  
     mv ./report.pdf ./data/analysis/report.pdf
 }
 
@@ -58,6 +69,8 @@ function handle_input {
             /bin/bash
         elif [[ "$1" = "run" ]] ; then
           run $@
+        elif [[ "$1" = "check" ]] ; then
+          check $@
         elif [[ "$1" = "analyze" ]] ; then
           analyze $@
         elif [[ "$1" = "reports" ]] ; then
